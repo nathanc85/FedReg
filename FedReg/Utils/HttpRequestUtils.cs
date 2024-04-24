@@ -14,7 +14,6 @@ namespace FedReg.Utils
     public class HttpRequestUtils
     {
         public static HttpClient _httpClient;
-        private static int MaxRetries { get; } = 3;
 
         public static void ConfigureClient(HttpClient client, string url)
         {
@@ -23,7 +22,7 @@ namespace FedReg.Utils
             if (_httpClient.BaseAddress is null)
             {
                 _httpClient.BaseAddress = new Uri(url);
-                _httpClient.Timeout = TimeSpan.FromMilliseconds(1000);
+                _httpClient.Timeout = TimeSpan.FromMilliseconds(5000);
                 _httpClient.DefaultRequestHeaders.Accept.Clear();
                 _httpClient.DefaultRequestHeaders.Accept.Add(
                     new MediaTypeWithQualityHeaderValue("application/json")
@@ -35,7 +34,7 @@ namespace FedReg.Utils
         {
             DocumentModel document = FactoryUtils.CreateDocument();
 
-            for (int retryAttempts = 0; retryAttempts < MaxRetries; retryAttempts++)
+            for (int retryAttempts = 0; retryAttempts < Constants.MaxRetries; retryAttempts++)
             {
                 HttpResponseMessage httpResponseMessage = await ReturnDocumentAsJsonAsync(documentNumber);
                 if (httpResponseMessage.IsSuccessStatusCode)

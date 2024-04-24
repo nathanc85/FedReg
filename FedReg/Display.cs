@@ -2,6 +2,7 @@
 using FedReg.Utils;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Mime;
@@ -20,6 +21,8 @@ namespace FedReg
 
         public static void ShowDocument(DocumentModel document)
         {
+            Console.WriteLine();
+
             foreach (var documentProp in document.GetType().GetProperties())
             {
                 if (documentProp.Name == "Agencies" && document.Agencies != null)
@@ -46,6 +49,8 @@ namespace FedReg
                     Console.WriteLine($"{documentProp.Name}: {documentProp.GetValue(document, null)}");
                 }
             }
+            Console.WriteLine();
+            Console.WriteLine();
         }
 
         //public static void ShowDocument(DocumentModel document)
@@ -76,13 +81,15 @@ namespace FedReg
 
         public static async Task RetrieveSingleDocument()
         {
-            Console.WriteLine("Please enter document reference to retrieve:");
+            Console.WriteLine("Please enter the document number of the regulation to retrieve:");
+            Console.WriteLine();
             String documentNumberToRetrieve = Console.ReadLine();
             try
             {
                 var document = await DocumentUtils.GetDocumentAsync(documentNumberToRetrieve);
                 ShowDocument(document);
-                SaveDocumentPDF(document);
+                DocumentUtils.SaveDocumentPDF(document);
+                await DocumentUtils.DownloadPdfHttp(document);
             }
             catch (Exception e)
             {
@@ -90,17 +97,11 @@ namespace FedReg
             }
         }
 
-        private static void SaveDocumentPDF(DocumentModel document)
+        public static void DisplayMenu()
         {
-            System.Net.WebClient webClient = new System.Net.WebClient();
-            string url = "https://www.govinfo.gov/content/pkg/FR-2022-02-01/pdf/2022-01961.pdf";
-            webClient.DownloadFile(url, $"C:\\Users\\cnlna\\Samples\\{document.DocumentNumber}.pdf");
-            
-            //byte[] bytes = webClient.DownloadData(url);
-            //Response.ContentType = ContentType;
-            //Response.AppendHeader("Content-Disposition", "attachment; filename=" + System.IO.Path.GetFileName(url));
-            //Response.BinaryWrite(bytes);
-            //Response.End();
+
         }
+
+
     }
 }

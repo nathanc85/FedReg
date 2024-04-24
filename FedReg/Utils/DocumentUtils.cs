@@ -37,5 +37,47 @@ namespace FedReg.Utils
         {
             return await HttpRequestUtils.GetDocumentAsJsonAsync(documentNumber);
         }
+
+        public static void SaveDocumentPDF(DocumentModel document)
+        {
+            System.Net.WebClient webClient = new System.Net.WebClient();
+            webClient.DownloadFile(document.PdfUrl, $"{Constants.Path}{document.DocumentNumber}.pdf");
+        }
+
+        public static async Task DownloadPdfHttp(DocumentModel document)
+        {
+            try
+            {
+                await DownloadPdfFileAsync(document.PdfUrl, $"{Constants.Path}{document.DocumentNumber}-1.pdf");
+                Console.WriteLine("PDF file downloaded successfully.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to download PDF file: {ex.Message}");
+            }
+        }
+
+        static async Task DownloadPdfFileAsync(string url, string filePath)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                // Send a GET request to the URL
+                HttpResponseMessage response = await client.GetAsync(url);
+
+                // Check if the request was successful
+                response.EnsureSuccessStatusCode();
+
+                // Get the content of the response as a stream
+                using (Stream pdfStream = await response.Content.ReadAsStreamAsync())
+                {
+                    // Create a FileStream to write the PDF content to a file
+                    using (FileStream fileStream = File.Create(filePath))
+                    {
+                        // Copy the content of the PDF stream to the file stream
+                        await pdfStream.CopyToAsync(fileStream);
+                    }
+                }
+            }
+        }
     }
 }

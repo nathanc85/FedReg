@@ -16,7 +16,7 @@ namespace FedReg.Models
         public string? Action { get; set; }
 
         [JsonProperty("agencies")]
-        public List<Agency>? Agencies { get; set; }
+        public List<AgencyModel>? Agencies { get; set; }
 
         [JsonProperty("body_html_url")]
         public string? BodyHtmlUrl { get; set; }
